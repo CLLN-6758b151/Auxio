@@ -467,6 +467,17 @@ class ExoPlaybackStateHolder(
 
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
         super.onPlayWhenReadyChanged(playWhenReady, reason)
+        val reasonName =
+            when (reason) {
+                Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST -> "USER_REQUEST"
+                Player.PLAY_WHEN_READY_CHANGE_REASON_AUDIO_FOCUS_LOSS -> "AUDIO_FOCUS_LOSS"
+                Player.PLAY_WHEN_READY_CHANGE_REASON_AUDIO_BECOMING_NOISY -> "AUDIO_BECOMING_NOISY"
+                Player.PLAY_WHEN_READY_CHANGE_REASON_REMOTE -> "REMOTE"
+                Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM -> "END_OF_MEDIA_ITEM"
+                Player.PLAY_WHEN_READY_CHANGE_REASON_SUPPRESSED_TOO_LONG -> "SUPPRESSED_TOO_LONG"
+                else -> "UNKNOWN($reason)"
+            }
+        L.d("onPlayWhenReadyChanged: playWhenReady=$playWhenReady, reason=$reasonName")
 
         if (player.playWhenReady) {
             // Mark that we have started playing so that the notification can now be posted.
@@ -485,6 +496,20 @@ class ExoPlaybackStateHolder(
             broadcastAudioEffectAction(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
             openAudioEffectSession = false
         }
+    }
+
+    override fun onPlaybackSuppressionReasonChanged(playbackSuppressionReason: Int) {
+        super.onPlaybackSuppressionReasonChanged(playbackSuppressionReason)
+        val reasonName =
+            when (playbackSuppressionReason) {
+                Player.PLAYBACK_SUPPRESSION_REASON_NONE -> "NONE"
+                Player.PLAYBACK_SUPPRESSION_REASON_TRANSIENT_AUDIO_FOCUS_LOSS ->
+                    "TRANSIENT_AUDIO_FOCUS_LOSS"
+                Player.PLAYBACK_SUPPRESSION_REASON_UNSUITABLE_AUDIO_OUTPUT ->
+                    "UNSUITABLE_AUDIO_OUTPUT"
+                else -> "UNKNOWN($playbackSuppressionReason)"
+            }
+        L.d("onPlaybackSuppressionReasonChanged: reason=$reasonName")
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
