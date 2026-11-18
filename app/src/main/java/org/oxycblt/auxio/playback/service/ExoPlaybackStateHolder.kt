@@ -88,6 +88,7 @@ class ExoPlaybackStateHolder(
     private val restoreScope = CoroutineScope(Dispatchers.IO + saveJob)
     private var currentSaveJob: Job? = null
     private var openAudioEffectSession = false
+    private val audioFocusController = AudioFocusController(context, player, AUDIO_ATTRIBUTES)
 
     var sessionOngoing = false
         private set
@@ -99,6 +100,9 @@ class ExoPlaybackStateHolder(
         replayGainProcessor.attach()
         playbackSettings.registerListener(this)
         imageSettings.registerListener(this)
+        if (playbackSettings.playDuringCalls) {
+            audioFocusController.updateForPlayerState(player.playWhenReady, player.playbackState)
+        }
     }
 
     fun release() {
@@ -109,6 +113,7 @@ class ExoPlaybackStateHolder(
         replayGainProcessor.release()
         imageSettings.unregisterListener(this)
         playbackSettings.unregisterListener(this)
+        audioFocusController.release()
         player.release()
     }
 
@@ -479,6 +484,10 @@ class ExoPlaybackStateHolder(
             }
         L.d("onPlayWhenReadyChanged: playWhenReady=$playWhenReady, reason=$reasonName")
 
+        if (playbackSettings.playDuringCalls) {
+            audioFocusController.updateForPlayerState(playWhenReady, player.playbackState)
+        }
+
         if (player.playWhenReady) {
             // Mark that we have started playing so that the notification can now be posted.
             L.d("Player has started playing")
@@ -514,6 +523,10 @@ class ExoPlaybackStateHolder(
 
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
+
+        if (playbackSettings.playDuringCalls) {
+            audioFocusController.updateForPlayerState(player.playWhenReady, playbackState)
+        }
 
         if (playbackState == Player.STATE_ENDED && player.repeatMode == Player.REPEAT_MODE_OFF) {
             goto(0)
@@ -581,6 +594,19 @@ class ExoPlaybackStateHolder(
     override fun onPauseOnRepeatChanged() {
         super.onPauseOnRepeatChanged()
         updatePauseOnRepeat()
+    }
+
+    override fun onPlayDuringCallsChanged() {
+        super.onPlayDuringCallsChanged()
+        val playDuringCalls = playbackSettings.playDuringCalls
+        L.d("Updating playDuringCalls setting: $playDuringCalls")
+        if (playDuringCalls) {
+            player.setAudioAttributes(AUDIO_ATTRIBUTES, false)
+            audioFocusController.updateForPlayerState(player.playWhenReady, player.playbackState)
+        } else {
+            audioFocusController.release()
+            player.setAudioAttributes(AUDIO_ATTRIBUTES, true)
+        }
     }
 
     private fun updatePauseOnRepeat() {
@@ -705,11 +731,8 @@ class ExoPlaybackStateHolder(
                     .setWakeMode(C.WAKE_MODE_LOCAL)
                     .setAudioAttributes(
                         // Signal that we are a music player.
-                        AudioAttributes.Builder()
-                            .setUsage(C.USAGE_MEDIA)
-                            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-                            .build(),
-                        true,
+                        AUDIO_ATTRIBUTES,
+                        !playbackSettings.playDuringCalls,
                     )
                     .build()
 
@@ -729,5 +752,10 @@ class ExoPlaybackStateHolder(
 
     private companion object {
         const val SAVE_BUFFER = 5000L
+        val AUDIO_ATTRIBUTES =
+            AudioAttributes.Builder()
+                .setUsage(C.USAGE_MEDIA)
+                .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                .build()
     }
 }
