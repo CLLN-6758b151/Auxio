@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+ 
 package org.oxycblt.auxio.playback.service
 
 import android.content.Context
@@ -34,9 +34,9 @@ import org.oxycblt.auxio.util.getSystemServiceCompat
 import timber.log.Timber as L
 
 /**
- * Custom audio focus controller supporting delayed audio focus gain (API 26+) so playback can
- * start while a call holds a transient/locked audio focus and seamlessly retain/regain focus once
- * the call ends.
+ * Custom audio focus controller supporting delayed audio focus gain (API 26+) so playback can start
+ * while a call holds a transient/locked audio focus and seamlessly retain/regain focus once the
+ * call ends.
  */
 @OptIn(UnstableApi::class)
 class AudioFocusController(
@@ -71,9 +71,7 @@ class AudioFocusController(
     private var pausedForFocus = false
     private var isChangingPlayerState = false
 
-    /**
-     * Synchronize audio focus with the current [playWhenReady] and [playbackState] of [player].
-     */
+    /** Synchronize audio focus with the current [playWhenReady] and [playbackState] of [player]. */
     fun updateForPlayerState(playWhenReady: Boolean, playbackState: Int) {
         if (playbackState == Player.STATE_IDLE) {
             pausedForFocus = false
@@ -162,8 +160,7 @@ class AudioFocusController(
             val request = requireNotNull(focusRequest)
             audioManager.abandonAudioFocusRequest(request)
         } else {
-            @Suppress("DEPRECATION")
-            audioManager.abandonAudioFocus(focusListener)
+            @Suppress("DEPRECATION") audioManager.abandonAudioFocus(focusListener)
         }
     }
 
