@@ -354,4 +354,6 @@
     <string name="err_share_failed">Incapaz de compartir esto</string>
     <string name="set_task_exit">Salir siempre al cerrar</string>
     <string name="set_task_exit_desc">Detiene la reproducción cuando se elimina de los recientes, incluso si reproduce</string>
+    <string name="set_play_during_calls">Reproducir durante llamadas</string>
+    <string name="set_play_during_calls_desc">Permite iniciar la reproducción mientras una llamada bloquea el audio. La petición queda en cola y Auxio recupera el foco al terminar</string>
 </resources>

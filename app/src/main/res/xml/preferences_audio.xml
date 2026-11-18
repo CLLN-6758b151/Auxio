@@ -27,6 +27,12 @@
             app:summary="@string/set_remember_pause_desc"
             app:title="@string/set_remember_pause" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="@string/set_key_play_during_calls"
+            app:summary="@string/set_play_during_calls_desc"
+            app:title="@string/set_play_during_calls" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/set_replay_gain">

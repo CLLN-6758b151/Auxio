@@ -58,6 +58,8 @@ interface PlaybackSettings : Settings<PlaybackSettings.Listener> {
     val pauseOnRepeat: Boolean
     /** Whether to maintain the play/pause state when skipping or editing the queue */
     val rememberPause: Boolean
+    /** Whether to allow starting playback while a call locks audio focus. */
+    val playDuringCalls: Boolean
     /** Whether to always exit when task is removed, even if playing. */
     val exitOnTaskRemoval: Boolean
 
@@ -70,6 +72,9 @@ interface PlaybackSettings : Settings<PlaybackSettings.Listener> {
 
         /** Called when [pauseOnRepeat] has changed. */
         fun onPauseOnRepeatChanged() {}
+
+        /** Called when [playDuringCalls] has changed. */
+        fun onPlayDuringCallsChanged() {}
     }
 }
 
@@ -133,6 +138,9 @@ class PlaybackSettingsImpl @Inject constructor(@ApplicationContext context: Cont
 
     override val rememberPause: Boolean
         get() = sharedPreferences.getBoolean(getString(R.string.set_key_remember_pause), false)
+
+    override val playDuringCalls: Boolean
+        get() = sharedPreferences.getBoolean(getString(R.string.set_key_play_during_calls), false)
 
     override val exitOnTaskRemoval: Boolean
         get() = sharedPreferences.getBoolean(getString(R.string.set_key_task_exit), false)
@@ -200,6 +208,10 @@ class PlaybackSettingsImpl @Inject constructor(@ApplicationContext context: Cont
             getString(R.string.set_key_repeat_pause) -> {
                 L.d("Dispatching pause on repeat change")
                 listener.onPauseOnRepeatChanged()
+            }
+            getString(R.string.set_key_play_during_calls) -> {
+                L.d("Dispatching play during calls change")
+                listener.onPlayDuringCallsChanged()
             }
         }
     }

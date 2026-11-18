@@ -306,6 +306,8 @@
     <string name="set_repeat_pause_desc">Pause when a song repeats</string>
     <string name="set_remember_pause">Remember pause</string>
     <string name="set_remember_pause_desc">Remain playing/paused when skipping or editing queue</string>
+    <string name="set_play_during_calls">Play during calls</string>
+    <string name="set_play_during_calls_desc">Allow starting playback while a call locks audio focus. The request is queued and Auxio regains focus when the call ends</string>
     <string name="set_replay_gain">Volume normalization</string>
     <string name="set_replay_gain_mode">ReplayGain strategy</string>
     <string name="set_replay_gain_mode_off">Off</string>
